@@ -1,6 +1,7 @@
 package org.skyscreamer.jsonassert;
 
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.skyscreamer.jsonassert.JSONCompare.compareJSON;
@@ -32,6 +33,8 @@ public class JSONCompareTest {
     public void reportsArrayMissingExpectedElement() throws JSONException {
         JSONCompareResult result = compareJSON("[4]", "[7]", LENIENT);
         assertThat(result, failsWithMessage(equalTo("[]\nExpected: 4\n     but none found\n ; []\nUnexpected: 7\n")));
+        assertEquals(result.getFieldMissing().size(), 1);
+        assertEquals(result.getFieldUnexpected().size(), 1);
     }
 
     @Test
@@ -44,6 +47,7 @@ public class JSONCompareTest {
     public void reportsMissingField() throws JSONException {
         JSONCompareResult result = compareJSON("{\"obj\": {\"id\": 3}}", "{\"obj\": {}}", LENIENT);
         assertThat(result, failsWithMessage(equalTo("obj\nExpected: id\n     but none found\n")));
+        assertEquals(result.getFieldMissing().size(), 1);
     }
 
     @Test
@@ -74,6 +78,7 @@ public class JSONCompareTest {
     public void reportsUnexpectedFieldInNonExtensibleMode() throws JSONException {
         JSONCompareResult result = compareJSON("{\"obj\": {}}", "{\"obj\": {\"id\": 3}}", NON_EXTENSIBLE);
         assertThat(result, failsWithMessage(equalTo("obj\nUnexpected: id\n")));
+        assertEquals(result.getFieldUnexpected().size(), 1);
     }
 
     @Test
@@ -86,6 +91,7 @@ public class JSONCompareTest {
     public void reportsWrongSimpleValueCountInUnorderedArray() throws JSONException {
         JSONCompareResult result = compareJSON("[5, 5]", "[5, 7]", LENIENT);
         assertThat(result, failsWithMessage(equalTo("[]: Expected 2 occurrence(s) of 5 but got 1 occurrence(s) ; []\nUnexpected: 7\n")));
+        assertEquals(result.getFieldUnexpected().size(), 1);
     }
 
     @Test
@@ -93,6 +99,8 @@ public class JSONCompareTest {
         JSONCompareResult result = compareJSON("[{\"id\" : 3}]", "[{\"id\" : 5}]", LENIENT);
         assertThat(result, failsWithMessage(equalTo("[id=3]\nExpected: a JSON object\n     but none found\n ; " +
                 "[id=5]\nUnexpected: a JSON object\n")));
+        assertEquals(result.getFieldMissing().size(), 1);
+        assertEquals(result.getFieldUnexpected().size(), 1);
     }
 
     @Test
